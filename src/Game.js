@@ -1,32 +1,71 @@
-import React, { useState } from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import Board from "./Board";
-import useSquares from "./useSquares";
-import useGame from "./useGame";
+import {PlayersContext} from "./App";
 
 
-function GameHook() { // test WIP
-    const [game, setGame] = useGame();
-    const [squares, setSquares] = useSquares();
+const GameHook = () => { // test WIP
+    const [squares, setSquares] = useState(Array(9));
+    const [xIsNext, setXIsNext] = useState(true);
+    const [winner, setWinner] = useState();
+    const [players] = useContext(PlayersContext);
 
-    // const handleClick = (i) => {
-    //
-    // }
+    useEffect(() => {
+        console.log('new players in game : ', players);
+    }, [players]);
 
+    useEffect(() => {
+        const lines = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6],
+        ];
+        for (let i = 0; i < lines.length; i++) {
+            const [a, b, c] = lines[i];
+            if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+                setWinner(squares[a]);
+                return;
+            }
+        }
+    }, [squares]);
+
+    const handleClick = useCallback( (i) => {
+        if (winner || squares[i]) {
+            return;
+        }
+    let sq = squares.slice();
+        sq[i] = xIsNext ? 'X' : 'O';
+        setXIsNext(!xIsNext);
+        setSquares(sq);
+    }, [squares, winner, xIsNext, setSquares, setXIsNext]);
 
     return (
         <div className="game">
             <div className="game-board">
                 <Board
                     squares={squares}
-                    onClick={(i) => this.handleClick(i)}
+                    onClick={handleClick}
                 />
+            </div>
+
+            <div className="game-info">
+                <div>
+                    {!winner && (
+                        <div>Au tour de {xIsNext ? players.player1 : players.player2 }</div>
+                    ) || <div>Les {winner} ont gagnés ! </div>}
+                </div>
             </div>
         </div>
     );
 
 
-}
+};
 
+export default GameHook;
 
 class Game extends React.Component {
     constructor(props) {
@@ -94,4 +133,3 @@ function calculateWinner(squares) {
     return null;
 }
 
-export default Game;

@@ -1,21 +1,13 @@
 import React, {useState} from 'react';
-import ReactDOM from 'react-dom';
-import usePlayers from "./usePlayers";
-import Game from "./Game";
 
-function Form() {
-    const [players, setPlayers] = usePlayers();
+const Form = ({setPlayerCallback}) =>  {
     const [localPlayers, setLocalPlayers] = useState({
         player1 : '',
         player2: '',
     });
 
     const handleSubmit = () => {
-        setPlayers(localPlayers);
-        ReactDOM.render(
-            <Game />,
-            document.getElementById('root')
-        );
+        setPlayerCallback(localPlayers);
     };
 
     return (
